@@ -12,21 +12,25 @@ public class WheelController : MonoBehaviour
     [SerializeField] Transform leftWheelTransform;
     [SerializeField] Transform rightWheelTransform;
 
-    public float acceleration = 100f;
-    public float breakingForce = 100f;
-    public float maxTurnAngle = 90f;
+    [SerializeField] Transform leftWheelCylinderTransform;
+    [SerializeField] Transform rightWheelCylinderTransform;
+
+    [SerializeField] float acceleration = 500f;
+    [SerializeField] float maxTurnAngle = 90f;
 
     //Left Wheel
-    public float currentLeftTurnAngle = 0f;
+    private float currentLeftTurnAngle = 0f;
     private float currentLeftAcceleration = 0f;
     private float currentLeftBreakForce = 0f;
 
     //Right Wheel
-    public float currentRightTurnAngle = 0f;
+    private float currentRightTurnAngle = 0f;
     private float currentRightAcceleration = 0f;
     private float currentRightBreakForce = 0f;
 
     PhotonView view;
+
+    Quaternion fixedRotation;
 
     private void Start()
     {
@@ -35,10 +39,16 @@ public class WheelController : MonoBehaviour
         {
             Destroy(camera);
         }
-        
+    }
+    private void Update()
+    {
+        fixedRotation = this.transform.rotation;
+        fixedRotation.x = 0;
+        fixedRotation.z = 0;
+        this.transform.rotation = fixedRotation;
     }
     private void FixedUpdate()
-    {
+    {     
         if (view.IsMine)
         {
             LeftWheelMovement();
@@ -46,14 +56,18 @@ public class WheelController : MonoBehaviour
         }
     }
 
-    void UpdateWheel(WheelCollider col, Transform trans)
+    void UpdateWheel(WheelCollider col, Transform trans, Transform Cyl)
     {
-        Vector3 poisition;
+        Vector3 position;
         Quaternion rotation;
 
-        col.GetWorldPose(out poisition, out rotation);
-        trans.position = poisition;
+        col.GetWorldPose(out position, out rotation);
+        trans.position = position;
         trans.rotation = rotation;
+
+        rotation.x = 0;
+        rotation.z = 0;
+        Cyl.rotation = rotation;
     }
 
     void LeftWheelMovement()
@@ -66,7 +80,7 @@ public class WheelController : MonoBehaviour
         currentLeftTurnAngle = maxTurnAngle * Input.GetAxis("LeftHorizontal");
         leftWheel.steerAngle = currentLeftTurnAngle;
 
-        UpdateWheel(leftWheel, leftWheelTransform);
+        UpdateWheel(leftWheel, leftWheelTransform, leftWheelCylinderTransform);
     }
 
     void RightWheelMovement()
@@ -79,6 +93,7 @@ public class WheelController : MonoBehaviour
         currentRightTurnAngle = maxTurnAngle * Input.GetAxis("RightHorizontal");
         rightWheel.steerAngle = currentRightTurnAngle;
 
-        UpdateWheel(rightWheel, rightWheelTransform);
+        UpdateWheel(rightWheel, rightWheelTransform, rightWheelCylinderTransform);
+        rightWheelTransform.position = rightWheelCylinderTransform.position;
     }
 }

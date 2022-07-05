@@ -137,6 +137,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public void OnClickPlayButton()
     {
+        Debug.Log("NotCool");
         PhotonNetwork.LoadLevel("Game");
     }
 
