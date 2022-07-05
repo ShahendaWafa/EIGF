@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class WheelController : MonoBehaviour
 {
+    [SerializeField] Camera camera;
     [SerializeField] WheelCollider leftWheel;
     [SerializeField] WheelCollider rightWheel;
 
@@ -19,18 +21,30 @@ public class WheelController : MonoBehaviour
     private float currentLeftAcceleration = 0f;
     private float currentLeftBreakForce = 0f;
 
-    //RightWheel
+    //Right Wheel
     public float currentRightTurnAngle = 0f;
     private float currentRightAcceleration = 0f;
     private float currentRightBreakForce = 0f;
 
+    PhotonView view;
 
+    private void Start()
+    {
+        view = GetComponent<PhotonView>();
+        if(!view.IsMine)
+        {
+            Destroy(camera);
+        }
+        
+    }
     private void FixedUpdate()
     {
-        LeftWheelMovement();
-        RightWheelMovement();
+        if (view.IsMine)
+        {
+            LeftWheelMovement();
+            RightWheelMovement();
+        }
     }
-
 
     void UpdateWheel(WheelCollider col, Transform trans)
     {
