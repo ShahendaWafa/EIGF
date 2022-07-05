@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -16,7 +16,7 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
         if(usernameInput.text.Length > 0)
         {
             PhotonNetwork.NickName = usernameInput.text;
-            buttonText.text = "Connecting...";
+            buttonText.text = "...جاري الاتصال";
             PhotonNetwork.AutomaticallySyncScene = true;
             PhotonNetwork.ConnectUsingSettings();
         }
