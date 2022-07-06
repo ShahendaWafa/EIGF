@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-
+using UnityEngine.SceneManagement;
+using TMPro;
 public class WheelController : MonoBehaviour
 {
     [SerializeField] Camera camera;
@@ -29,13 +30,13 @@ public class WheelController : MonoBehaviour
     private float currentRightBreakForce = 0f;
 
     PhotonView view;
-
     Quaternion fixedRotation;
 
+    
     private void Start()
     {
         view = GetComponent<PhotonView>();
-        if(!view.IsMine)
+        if (!view.IsMine)
         {
             Destroy(camera);
         }
@@ -95,5 +96,18 @@ public class WheelController : MonoBehaviour
 
         UpdateWheel(rightWheel, rightWheelTransform, rightWheelCylinderTransform);
         rightWheelTransform.position = rightWheelCylinderTransform.position;
+    }
+
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        view.RPC(nameof(GameOver), RpcTarget.All, view.Owner.NickName);
+    }
+
+    [PunRPC]
+    void GameOver(string winner)
+    {
+        Winner.winnerName = winner;
+        PhotonNetwork.LoadLevel("GameOver");
     }
 }
