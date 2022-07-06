@@ -212,7 +212,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3683454167702512734}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 40, y: 40, z: 40}
   m_ConstrainProportionsScale: 0
@@ -221,7 +221,7 @@ Transform:
   - {fileID: 6704441409463219735}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!54 &2414356647826020976
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -231,8 +231,8 @@ Rigidbody:
   m_GameObject: {fileID: 3683454167702512734}
   serializedVersion: 2
   m_Mass: 1000
-  m_Drag: 0.6
-  m_AngularDrag: 1
+  m_Drag: 0.1
+  m_AngularDrag: 1.5
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -245,12 +245,12 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3683454167702512734}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 7c26b4e2ae454a74db242119474eaac7, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.04981166, y: 0.010522979, z: 0.017977545}
-  m_Center: {x: 0.000008451939, y: 0.0010494024, z: 0.000032179058}
+  m_Size: {x: 0.053767372, y: 0.010522979, z: 0.020515557}
+  m_Center: {x: 0.00028040409, y: 0.0010494024, z: 0.00019268246}
 --- !u!114 &7971723833638403194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,8 +270,9 @@ MonoBehaviour:
   rightWheelTransform: {fileID: 4132589646708154475}
   leftWheelCylinderTransform: {fileID: 1811951100557474528}
   rightWheelCylinderTransform: {fileID: 2741985386219555273}
-  acceleration: 2500
+  acceleration: 100
   maxTurnAngle: 90
+  speed: 100
 --- !u!114 &-7480248649972173866
 MonoBehaviour:
   m_ObjectHideFlags: 0

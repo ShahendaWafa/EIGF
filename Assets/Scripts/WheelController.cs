@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 public class WheelController : MonoBehaviour
 {
+    Rigidbody rb;
     [SerializeField] Camera camera;
     [SerializeField] WheelCollider leftWheel;
     [SerializeField] WheelCollider rightWheel;
@@ -19,6 +20,10 @@ public class WheelController : MonoBehaviour
     [SerializeField] float acceleration = 500f;
     [SerializeField] float maxTurnAngle = 90f;
 
+    [SerializeField] float speed = 100f;
+
+    float leftVInput;
+    float rightVInput;
     //Left Wheel
     private float currentLeftTurnAngle = 0f;
     private float currentLeftAcceleration = 0f;
@@ -35,6 +40,7 @@ public class WheelController : MonoBehaviour
     
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
         view = GetComponent<PhotonView>();
         if (!view.IsMine)
         {
@@ -43,13 +49,16 @@ public class WheelController : MonoBehaviour
     }
     private void Update()
     {
-        fixedRotation = this.transform.rotation;
+        fixedRotation = transform.rotation;
         fixedRotation.x = 0;
         fixedRotation.z = 0;
-        this.transform.rotation = fixedRotation;
+        transform.rotation = fixedRotation;
     }
     private void FixedUpdate()
     {     
+        leftVInput = Input.GetAxis("LeftVertical");
+        rightVInput = Input.GetAxis("RightVertical");
+
         if (view.IsMine)
         {
             LeftWheelMovement();
@@ -73,10 +82,15 @@ public class WheelController : MonoBehaviour
 
     void LeftWheelMovement()
     {
-        currentLeftAcceleration = acceleration * Input.GetAxis("LeftVertical");
+        currentLeftAcceleration = acceleration * leftVInput;
 
-        leftWheel.motorTorque = currentLeftAcceleration;
-        leftWheel.brakeTorque = currentLeftBreakForce;
+        if (currentLeftAcceleration == 0)
+            leftWheel.brakeTorque = Mathf.Infinity;
+        else
+        {
+            leftWheel.brakeTorque = 0;
+            leftWheel.motorTorque = currentLeftAcceleration * speed;
+        }
 
         currentLeftTurnAngle = maxTurnAngle * Input.GetAxis("LeftHorizontal");
         leftWheel.steerAngle = currentLeftTurnAngle;
@@ -86,10 +100,18 @@ public class WheelController : MonoBehaviour
 
     void RightWheelMovement()
     {
-        currentRightAcceleration = acceleration * Input.GetAxis("RightVertical");
+        currentRightAcceleration = acceleration * rightVInput;
+        Debug.Log(currentRightAcceleration);
 
-        rightWheel.motorTorque = currentRightAcceleration;
-        rightWheel.brakeTorque = currentRightBreakForce;
+        if (currentRightAcceleration == 0)
+        {
+            rightWheel.brakeTorque = Mathf.Infinity;      
+        }
+        else
+        {
+            rightWheel.brakeTorque = 0;
+            rightWheel.motorTorque = currentRightAcceleration * speed;
+        }
 
         currentRightTurnAngle = maxTurnAngle * Input.GetAxis("RightHorizontal");
         rightWheel.steerAngle = currentRightTurnAngle;
@@ -110,4 +132,5 @@ public class WheelController : MonoBehaviour
         Winner.winnerName = winner;
         PhotonNetwork.LoadLevel("GameOver");
     }
+
 }
