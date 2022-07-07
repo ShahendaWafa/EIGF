@@ -21,14 +21,14 @@ public class PlayerSpawner : MonoBehaviour
             startCutscene.SetActive(true);
             StartCoroutine(StartScene());
         }
-        
-
     }
 
     void SpawnPlayers()
     {
         Vector3 spawnPos = spawnPoints[(PhotonNetwork.LocalPlayer.ActorNumber - 1)].position;
-        PhotonNetwork.Instantiate("Hoverboard", spawnPos, Quaternion.identity);
+        Quaternion spawnRot = spawnPoints[(PhotonNetwork.LocalPlayer.ActorNumber - 1)].rotation;
+
+        PhotonNetwork.Instantiate("Hoverboard", spawnPos, spawnRot);
     }
 
     IEnumerator StartScene()
