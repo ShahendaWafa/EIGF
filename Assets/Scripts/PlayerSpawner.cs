@@ -17,7 +17,7 @@ public class PlayerSpawner : MonoBehaviour
             StartCoroutine(EndScene());
         }
         else
-        {
+        { 
             startCutscene.SetActive(true);
             StartCoroutine(StartScene());
         }
