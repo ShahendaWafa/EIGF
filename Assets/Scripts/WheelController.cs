@@ -8,8 +8,11 @@ using UnityEngine.UI;
 public class WheelController : MonoBehaviour
 {
     Rigidbody rb;
-    [SerializeField] GameObject HB;
-    [SerializeField] Slider slider;
+
+    [SerializeField] Slider leftSlider;
+    [SerializeField] Slider rightSlider;
+
+
     [SerializeField] Camera camera;
     [SerializeField] WheelCollider leftWheel;
     [SerializeField] WheelCollider rightWheel;
@@ -20,11 +23,11 @@ public class WheelController : MonoBehaviour
     [SerializeField] Transform leftWheelCylinderTransform;
     [SerializeField] Transform rightWheelCylinderTransform;
 
-    [SerializeField] float acceleration = 500f;
+    [SerializeField] float acceleration = 50;
     [SerializeField] float maxTurnAngle = 90f;
 
-    [SerializeField] float leftSpeed = 100f;
-    [SerializeField] float rightSpeed = 100f;
+    [SerializeField] float leftSpeed = 10;
+    [SerializeField] float rightSpeed = 10;
 
     [SerializeField] float nitroSpeedMul = 10;
 
@@ -40,8 +43,8 @@ public class WheelController : MonoBehaviour
     private float currentRightAcceleration = 0f;
     private float currentRightBreakForce = 0f;
 
-    int leftNitro = 20;
-    int rightNitro = 10;
+    public int leftNitroVal = 20;
+    public int rightNitroVal = 20;
 
     int leftForce = 0;
     int rightForce = 0;
@@ -64,14 +67,17 @@ public class WheelController : MonoBehaviour
         if (!view.IsMine)
         {
             Destroy(camera);
-            HB.SetActive(false);
+            leftSlider.gameObject.SetActive(false);
+            rightSlider.gameObject.SetActive(false);
         }
     }
     private void Update()
     {
         if (view.IsMine)
         {
-            slider.value = leftNitro;
+            leftSlider.value = leftNitroVal;
+            rightSlider.value = rightNitroVal;
+
             fixedRotation = transform.rotation;
             fixedRotation.x = 0;
             fixedRotation.z = 0;
@@ -79,12 +85,11 @@ public class WheelController : MonoBehaviour
 
             if (Input.GetKey(KeyCode.LeftControl))
             {
-                if (!leftNActivated && leftNitro > 0)
+                if (!leftNActivated && leftNitroVal > 0)
                 {
                     leftNActivated = true;
                     leftForce = 1;
                     leftSpeed *= nitroSpeedMul;
-                    rightSpeed *= nitroSpeedMul;
                     StartCoroutine(ActivateLeftNitro());
                 }
             }
@@ -93,12 +98,20 @@ public class WheelController : MonoBehaviour
                 leftForce = 0;
                 leftNActivated = false;
             }
-            if (Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.RightControl))
             {
-                if (!rightNActivated)
+                if (!rightNActivated && rightNitroVal > 0)
                 {
                     rightNActivated = true;
+                    rightForce = 1;
+                    rightSpeed *= nitroSpeedMul;
+                    StartCoroutine(ActivateRightNitro());
                 }
+            }
+            else
+            {
+                rightForce = 0;
+                rightNActivated = false;
             }
         } 
     }
@@ -187,9 +200,8 @@ public class WheelController : MonoBehaviour
     {
         while (leftNActivated)
         {
-            leftNitro -= 2;
-            Debug.Log(leftNitro);
-            if(leftNitro < 0) leftNitro = 0;
+            leftNitroVal -= 2;
+            if(leftNitroVal < 0) leftNitroVal = 0;
             yield return new WaitForSeconds(1.0f);
 
         }
@@ -198,20 +210,48 @@ public class WheelController : MonoBehaviour
         leftNCharging = true;
         StartCoroutine(ChargeLeftNitro());
         leftSpeed /= nitroSpeedMul;
-        rightSpeed /= nitroSpeedMul;
     }
 
     IEnumerator ChargeLeftNitro()
     {
-        while(leftNitro < 10)
+        while(leftNitroVal < 20)
         {
             if (leftNActivated)
                 break;
-            leftNitro++;
+            leftNitroVal++;
             yield return new WaitForSeconds(1.0f);
         }
         StopCoroutine(ChargeLeftNitro());
         leftNCharging = false;
+    }
+
+    IEnumerator ActivateRightNitro()
+    {
+        while (rightNActivated)
+        {
+            rightNitroVal -= 2;
+            if (rightNitroVal < 0) rightNitroVal = 0;
+            yield return new WaitForSeconds(1.0f);
+
+        }
+        rightNActivated = false;
+        StopCoroutine(ActivateRightNitro());
+        rightNCharging = true;
+        StartCoroutine(ChargeRightNitro());
+        rightSpeed /= nitroSpeedMul;
+    }
+
+    IEnumerator ChargeRightNitro()
+    {
+        while (rightNitroVal < 20)
+        {
+            if (rightNActivated)
+                break;
+            rightNitroVal++;
+            yield return new WaitForSeconds(1.0f);
+        }
+        StopCoroutine(ChargeRightNitro());
+        rightNCharging = false;
     }
 
 }
