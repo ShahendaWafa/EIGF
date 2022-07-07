@@ -96,11 +96,12 @@ public class WheelController : MonoBehaviour
                 {
                     CameraSwitcher.SwitchCamera(ZoomCamera);
                 }
-                if (!isShaking)
-                {
-                    isShaking = true;
-                    StartCoroutine(ShakeCamera());
-                }
+                //if (!isShaking)
+                //{
+                //    isShaking = true;
+                //    StartCoroutine(ShakeCamera());
+                //}
+                CinemachineShake.Instance.ShakeCamera(5f, .1f);
                 screenEffect.gameObject.SetActive(true);
 
             }
