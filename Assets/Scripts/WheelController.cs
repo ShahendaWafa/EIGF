@@ -9,11 +9,14 @@ public class WheelController : MonoBehaviour
 {
     Rigidbody rb;
 
+    [SerializeField] ParticleSystem leftSmokePrefab;
+    [SerializeField] ParticleSystem rightSmokePrefab;
+
     [SerializeField] Slider leftSlider;
     [SerializeField] Slider rightSlider;
 
-
     [SerializeField] Camera camera;
+    [SerializeField] Transform cameraTransform;
     [SerializeField] WheelCollider leftWheel;
     [SerializeField] WheelCollider rightWheel;
 
@@ -48,7 +51,7 @@ public class WheelController : MonoBehaviour
 
     int leftForce = 0;
     int rightForce = 0;
-    
+
 
     bool leftNActivated = false;
     bool rightNActivated = false;
@@ -59,7 +62,7 @@ public class WheelController : MonoBehaviour
     PhotonView view;
     Quaternion fixedRotation;
 
-    
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -85,17 +88,20 @@ public class WheelController : MonoBehaviour
 
             if (Input.GetKey(KeyCode.LeftControl) && leftNitroVal > 0)
             {
-                if(!leftNActivated)
+                if (!leftNActivated)
                 {
+                    leftSmokePrefab.gameObject.SetActive(true);
                     leftNActivated = true;
                     leftForce = 1;
                     leftSpeed *= nitroSpeedMul;
                     StartCoroutine(ActivateLeftNitro());
+                    StartCoroutine(ShakeCamera());
                 }
 
             }
             else
             {
+                leftSmokePrefab.gameObject.SetActive(false);
                 leftForce = 0;
                 leftNActivated = false;
             }
@@ -103,21 +109,26 @@ public class WheelController : MonoBehaviour
             {
                 if (!rightNActivated)
                 {
+                    rightSmokePrefab.gameObject.SetActive(true);
+
                     rightNActivated = true;
                     rightForce = 1;
                     rightSpeed *= nitroSpeedMul;
                     StartCoroutine(ActivateRightNitro());
+                    StartCoroutine(ShakeCamera());
+
                 }
             }
             else
             {
+                rightSmokePrefab.gameObject.SetActive(false);
                 rightForce = 0;
                 rightNActivated = false;
             }
-        } 
+        }
     }
     private void FixedUpdate()
-    {     
+    {
         leftVInput = Input.GetAxis("LeftVertical") + leftForce;
         rightVInput = Input.GetAxis("RightVertical") + rightForce;
 
@@ -160,8 +171,8 @@ public class WheelController : MonoBehaviour
                 rb.AddForce(transform.forward * 10000);
             }
         }
-        
-        
+
+
 
         UpdateWheel(leftWheel, leftWheelTransform, leftWheelCylinderTransform);
     }
@@ -174,11 +185,11 @@ public class WheelController : MonoBehaviour
 
         if (currentRightAcceleration == 0)
         {
-            rightWheel.brakeTorque = Mathf.Infinity;      
+            rightWheel.brakeTorque = Mathf.Infinity;
         }
         else
         {
-           
+
             rightWheel.brakeTorque = 0;
             rightWheel.motorTorque = currentRightAcceleration * rightSpeed;
             if (rightNActivated)
@@ -187,12 +198,12 @@ public class WheelController : MonoBehaviour
             }
         }
 
-        
+
 
         UpdateWheel(rightWheel, rightWheelTransform, rightWheelCylinderTransform);
     }
 
-    
+
     private void OnTriggerEnter(Collider other)
     {
         view.RPC(nameof(GameOver), RpcTarget.All, view.Owner.NickName);
@@ -210,7 +221,7 @@ public class WheelController : MonoBehaviour
         while (leftNActivated)
         {
             leftNitroVal -= 2;
-            if(leftNitroVal < 0) leftNitroVal = 0;
+            if (leftNitroVal < 0) leftNitroVal = 0;
             yield return new WaitForSeconds(1.0f);
 
         }
@@ -223,7 +234,7 @@ public class WheelController : MonoBehaviour
 
     IEnumerator ChargeLeftNitro()
     {
-        while(leftNitroVal < 4)
+        while (leftNitroVal < 4)
         {
             if (leftNActivated)
                 break;
@@ -256,11 +267,23 @@ public class WheelController : MonoBehaviour
         {
             if (rightNActivated)
                 break;
-            rightNitroVal +=  0.5f;
+            rightNitroVal += 0.5f;
             yield return new WaitForSeconds(1.0f);
         }
         StopCoroutine(ChargeRightNitro());
         rightNCharging = false;
     }
 
+    IEnumerator ShakeCamera()
+    {
+        while (leftNActivated || rightNActivated)
+        {
+            float x = Random.Range(-1f, 1f) * 0.3f;
+            float y = Random.Range(-1f, 1f) * 0.3f;
+            camera.transform.position = new Vector3(camera.transform.position.x + x, camera.transform.position.y + y, camera.transform.position.z);
+            yield return null;
+        }
+        camera.transform.position = cameraTransform.position;
+        StopCoroutine(ShakeCamera());
+    }
 }
