@@ -241,7 +241,8 @@ public class WheelController : MonoBehaviour
     void GameOver(string winner)
     {
         Winner.winnerName = winner;
-        PhotonNetwork.LoadLevel("GameOver");
+        Winner.gameWon = true;
+        PhotonNetwork.LoadLevel("Game");
     }
 
     IEnumerator ActivateLeftNitro()
