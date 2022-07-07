@@ -59,7 +59,11 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     void UpdateRoomList(List<RoomInfo> list)
     {
-        foreach(RoomItem item in roomItemsList)
+        foreach (Transform child in contentObject)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (RoomItem item in roomItemsList)
         {
             Destroy(item.gameObject);
         }
@@ -97,6 +101,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     void UpdatePlayerList()
     {
+        foreach(Transform child in playerItemParent)
+        {
+            Destroy(child.gameObject);
+        }
         foreach (PlayerItem item in playerItemsList)
         {
             Destroy(item);
@@ -108,7 +116,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         foreach(KeyValuePair<int, Player> player in PhotonNetwork.CurrentRoom.Players)
         {
-            PlayerItem newPlayerItem = Instantiate(playerItemPrefab, playerItemParent);
+            PlayerItem newPlayerItem = Instantiate(playerItemPrefab, playerItemParent.transform);
             playerItemsList.Add(newPlayerItem);
             newPlayerItem.SetPlayerInfo(player.Value);
         }
