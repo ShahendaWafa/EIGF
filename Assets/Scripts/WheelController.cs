@@ -83,24 +83,25 @@ public class WheelController : MonoBehaviour
             fixedRotation.z = 0;
             transform.rotation = fixedRotation;
 
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (Input.GetKey(KeyCode.LeftControl) && leftNitroVal > 0)
             {
-                if (!leftNActivated && leftNitroVal > 0)
+                if(!leftNActivated)
                 {
                     leftNActivated = true;
                     leftForce = 1;
                     leftSpeed *= nitroSpeedMul;
                     StartCoroutine(ActivateLeftNitro());
                 }
+
             }
             else
             {
                 leftForce = 0;
                 leftNActivated = false;
             }
-            if (Input.GetKey(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.RightControl) && rightNitroVal > 0)
             {
-                if (!rightNActivated && rightNitroVal > 0)
+                if (!rightNActivated)
                 {
                     rightNActivated = true;
                     rightForce = 1;
@@ -152,8 +153,6 @@ public class WheelController : MonoBehaviour
             leftWheel.brakeTorque = 0;
             leftWheel.motorTorque = currentLeftAcceleration * leftSpeed;
         }
-        Debug.Log("Left");
-        Debug.Log(leftWheel.motorTorque);
         currentLeftTurnAngle = maxTurnAngle * Input.GetAxis("LeftHorizontal");
         leftWheel.steerAngle = currentLeftTurnAngle;
 
@@ -174,8 +173,6 @@ public class WheelController : MonoBehaviour
             rightWheel.motorTorque = currentRightAcceleration * rightSpeed;
         }
 
-        Debug.Log("Right");
-        Debug.Log(rightWheel.motorTorque);
         currentRightTurnAngle = maxTurnAngle * Input.GetAxis("RightHorizontal");
         rightWheel.steerAngle = currentRightTurnAngle;
 
