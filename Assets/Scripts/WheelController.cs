@@ -5,6 +5,8 @@ using Photon.Pun;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using Cinemachine;
+
 public class WheelController : MonoBehaviour
 {
     Rigidbody rb;
@@ -16,7 +18,9 @@ public class WheelController : MonoBehaviour
     [SerializeField] Slider leftSlider;
     [SerializeField] Slider rightSlider;
 
-    [SerializeField] Camera camera;
+    [SerializeField] CinemachineVirtualCamera camera;
+    [SerializeField] CinemachineVirtualCamera ZoomCamera;
+
 
     [SerializeField] Transform cameraTransform;
     [SerializeField] WheelCollider leftWheel;
@@ -83,8 +87,29 @@ public class WheelController : MonoBehaviour
     }
     private void Update()
     {
+
         if (view.IsMine)
         {
+            if(leftNActivated||rightNActivated)
+            {
+                if (CameraSwitcher.IsActiveCamera(camera))
+                {
+                    CameraSwitcher.SwitchCamera(ZoomCamera);
+                }
+                if (!isShaking)
+                {
+                    isShaking = true;
+                    StartCoroutine(ShakeCamera());
+                }
+                screenEffect.gameObject.SetActive(true);
+
+            }
+            else
+            {
+                if (!CameraSwitcher.IsActiveCamera(camera))
+                    CameraSwitcher.SwitchCamera(camera);
+                screenEffect.gameObject.SetActive(false);
+            }
             leftSlider.value = leftNitroVal;
             rightSlider.value = rightNitroVal;
 
@@ -98,22 +123,14 @@ public class WheelController : MonoBehaviour
                 if (!leftNActivated)
                 {
                     leftSmokePrefab.Play();
-                    screenEffect.gameObject.SetActive(true);
                     leftNActivated = true;
                     leftForce = 1;
                     leftSpeed *= nitroSpeedMul;
-                    StartCoroutine(ActivateLeftNitro());
-                    if(!isShaking)
-                    {
-                        isShaking = true;
-                        StartCoroutine(ShakeCamera());
-                    }
-                }
-
+                    StartCoroutine(ActivateLeftNitro());                                    
+                }               
             }
             else
-            {
-                screenEffect.gameObject.SetActive(false);
+            {                
                 leftSmokePrefab.Stop();
                 leftForce = 0;
                 leftNActivated = false;
@@ -123,24 +140,15 @@ public class WheelController : MonoBehaviour
                 if (!rightNActivated)
                 {
                     rightSmokePrefab.Play();
-                    screenEffect.gameObject.SetActive(true);
-
                     rightNActivated = true;
                     rightForce = 1;
                     rightSpeed *= nitroSpeedMul;
-                    StartCoroutine(ActivateRightNitro());
-                    if (!isShaking)
-                    {
-                        isShaking = true;
-                        StartCoroutine(ShakeCamera());
-                    }
-                }
+                    StartCoroutine(ActivateRightNitro());                                        
+                }              
             }
             else
             {
                 rightSmokePrefab.Stop();
-                screenEffect.gameObject.SetActive(false);
-
                 rightForce = 0;
                 rightNActivated = false;
             }
@@ -299,15 +307,29 @@ public class WheelController : MonoBehaviour
         float allY = 0;
         while (leftNActivated || rightNActivated)
         {
+            Debug.Log("test");
             float x = Random.Range(-1f, 1f) * 0.2f;
             float y = Random.Range(-1f, 1f) * 0.2f;
             allX += x;
             allY += y;
-            camera.transform.position = new Vector3(camera.transform.position.x + x, camera.transform.position.y + y, camera.transform.position.z);
+            ZoomCamera.transform.position = new Vector3(ZoomCamera.transform.position.x + x, ZoomCamera.transform.position.y + y, ZoomCamera.transform.position.z);
             yield return null;
         }
-        camera.transform.position = new Vector3(camera.transform.position.x - allX, camera.transform.position.y - allY, camera.transform.position.z);
+        ZoomCamera.transform.position = new Vector3(ZoomCamera.transform.position.x - allX, ZoomCamera.transform.position.y - allY, ZoomCamera.transform.position.z);
         isShaking = false;
         StopCoroutine(ShakeCamera());
+    }
+
+    private void OnEnable()
+    {
+        CameraSwitcher.Register(camera);
+        CameraSwitcher.Register(ZoomCamera);
+        CameraSwitcher.SwitchCamera(camera);
+    }
+
+    private void OnDisable()
+    {
+        CameraSwitcher.Unregister(camera);
+        CameraSwitcher.Unregister(ZoomCamera);
     }
 }
