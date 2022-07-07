@@ -78,6 +78,7 @@ public class WheelController : MonoBehaviour
                 if (!leftNActivated)
                 {
                     leftNActivated = true;
+                    leftVInput = 1;
                     leftSpeed *= nitroSpeedMul;
                     rightSpeed *= nitroSpeedMul;
                     StartCoroutine(ActivateLeftNitro());
@@ -95,7 +96,10 @@ public class WheelController : MonoBehaviour
     }
     private void FixedUpdate()
     {     
-        leftVInput = Input.GetAxis("LeftVertical");
+        if(!leftNActivated)
+        {
+            leftVInput = Input.GetAxis("LeftVertical");
+        }
         rightVInput = Input.GetAxis("RightVertical");
 
         if (view.IsMine)

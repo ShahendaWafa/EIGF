@@ -10,13 +10,14 @@ public class ConnectToServer : MonoBehaviourPunCallbacks
 {
     [SerializeField] TMP_InputField usernameInput;
     [SerializeField] TMP_Text buttonText;
-
+    [SerializeField] TMP_Text newButtonText;
     public void OnClickConnect()
     {
         if(usernameInput.text.Length > 0)
         {
             PhotonNetwork.NickName = usernameInput.text;
-            buttonText.text = "...جاري الاتصال";
+            newButtonText.gameObject.SetActive(true);
+            buttonText.gameObject.SetActive(false);
             PhotonNetwork.AutomaticallySyncScene = true;
             PhotonNetwork.ConnectUsingSettings();
         }
