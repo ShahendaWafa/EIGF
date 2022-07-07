@@ -93,9 +93,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 10
+  m_MaxValue: 4
   m_WholeNumbers: 0
-  m_Value: 10
+  m_Value: 4
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -563,9 +563,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 1
   m_MinValue: 0
-  m_MaxValue: 20
+  m_MaxValue: 4
   m_WholeNumbers: 0
-  m_Value: 20
+  m_Value: 4
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -998,8 +998,8 @@ MonoBehaviour:
   leftSpeed: 100
   rightSpeed: 100
   nitroSpeedMul: 10
-  leftNitroVal: 20
-  rightNitroVal: 20
+  leftNitroVal: 4
+  rightNitroVal: 4
 --- !u!114 &1544174940953659097
 MonoBehaviour:
   m_ObjectHideFlags: 0

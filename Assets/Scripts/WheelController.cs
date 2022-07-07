@@ -43,8 +43,8 @@ public class WheelController : MonoBehaviour
     private float currentRightAcceleration = 0f;
     private float currentRightBreakForce = 0f;
 
-    public int leftNitroVal = 20;
-    public int rightNitroVal = 20;
+    public float leftNitroVal = 4;
+    public float rightNitroVal = 4;
 
     int leftForce = 0;
     int rightForce = 0;
@@ -223,11 +223,11 @@ public class WheelController : MonoBehaviour
 
     IEnumerator ChargeLeftNitro()
     {
-        while(leftNitroVal < 20)
+        while(leftNitroVal < 4)
         {
             if (leftNActivated)
                 break;
-            leftNitroVal++;
+            leftNitroVal += 0.5f;
             yield return new WaitForSeconds(1.0f);
         }
         StopCoroutine(ChargeLeftNitro());
@@ -252,11 +252,11 @@ public class WheelController : MonoBehaviour
 
     IEnumerator ChargeRightNitro()
     {
-        while (rightNitroVal < 20)
+        while (rightNitroVal < 4)
         {
             if (rightNActivated)
                 break;
-            rightNitroVal++;
+            rightNitroVal +=  0.5f;
             yield return new WaitForSeconds(1.0f);
         }
         StopCoroutine(ChargeRightNitro());
