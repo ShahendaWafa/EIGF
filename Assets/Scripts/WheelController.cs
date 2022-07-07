@@ -4,9 +4,12 @@ using UnityEngine;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.UI;
 public class WheelController : MonoBehaviour
 {
     Rigidbody rb;
+    [SerializeField] GameObject HB;
+    [SerializeField] Slider slider;
     [SerializeField] Camera camera;
     [SerializeField] WheelCollider leftWheel;
     [SerializeField] WheelCollider rightWheel;
@@ -20,7 +23,10 @@ public class WheelController : MonoBehaviour
     [SerializeField] float acceleration = 500f;
     [SerializeField] float maxTurnAngle = 90f;
 
-    [SerializeField] float speed = 100f;
+    [SerializeField] float leftSpeed = 100f;
+    [SerializeField] float rightSpeed = 100f;
+
+    [SerializeField] float nitroSpeedMul = 10;
 
     float leftVInput;
     float rightVInput;
@@ -34,6 +40,15 @@ public class WheelController : MonoBehaviour
     private float currentRightAcceleration = 0f;
     private float currentRightBreakForce = 0f;
 
+    public int leftNitro = 10;
+    public int rightNitro = 10;
+
+    bool leftNActivated = false;
+    bool rightNActivated = false;
+
+    bool leftNCharging = false;
+    bool rightNCharging = false;
+
     PhotonView view;
     Quaternion fixedRotation;
 
@@ -45,14 +60,38 @@ public class WheelController : MonoBehaviour
         if (!view.IsMine)
         {
             Destroy(camera);
+            HB.SetActive(false);
         }
     }
     private void Update()
     {
-        fixedRotation = transform.rotation;
-        fixedRotation.x = 0;
-        fixedRotation.z = 0;
-        transform.rotation = fixedRotation;
+        if (view.IsMine)
+        {
+            slider.value = leftNitro;
+            fixedRotation = transform.rotation;
+            fixedRotation.x = 0;
+            fixedRotation.z = 0;
+            transform.rotation = fixedRotation;
+
+            if (Input.GetKeyDown(KeyCode.LeftControl))
+            {
+                if (!leftNActivated)
+                {
+                    leftNActivated = true;
+                    leftSpeed *= nitroSpeedMul;
+                    rightSpeed *= nitroSpeedMul;
+                    StartCoroutine(ActivateLeftNitro());
+
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.RightControl))
+            {
+                if (!rightNActivated)
+                {
+                    rightNActivated = true;
+                }
+            }
+        } 
     }
     private void FixedUpdate()
     {     
@@ -89,7 +128,7 @@ public class WheelController : MonoBehaviour
         else
         {
             leftWheel.brakeTorque = 0;
-            leftWheel.motorTorque = currentLeftAcceleration * speed;
+            leftWheel.motorTorque = currentLeftAcceleration * leftSpeed;
         }
 
         currentLeftTurnAngle = maxTurnAngle * Input.GetAxis("LeftHorizontal");
@@ -101,7 +140,6 @@ public class WheelController : MonoBehaviour
     void RightWheelMovement()
     {
         currentRightAcceleration = acceleration * rightVInput;
-        Debug.Log(currentRightAcceleration);
 
         if (currentRightAcceleration == 0)
         {
@@ -110,7 +148,7 @@ public class WheelController : MonoBehaviour
         else
         {
             rightWheel.brakeTorque = 0;
-            rightWheel.motorTorque = currentRightAcceleration * speed;
+            rightWheel.motorTorque = currentRightAcceleration * rightSpeed;
         }
 
         currentRightTurnAngle = maxTurnAngle * Input.GetAxis("RightHorizontal");
@@ -131,6 +169,37 @@ public class WheelController : MonoBehaviour
     {
         Winner.winnerName = winner;
         PhotonNetwork.LoadLevel("GameOver");
+    }
+
+    IEnumerator ActivateLeftNitro()
+    {
+        while (leftNitro > 0)
+        {
+            leftNitro -= 2;
+            Debug.Log(leftNitro);
+
+            yield return new WaitForSeconds(1.0f);
+
+        }
+        leftNActivated = false;
+        StopCoroutine(ActivateLeftNitro());
+        leftNCharging = true;
+        StartCoroutine(ChargeLeftNitro());
+        leftSpeed /= nitroSpeedMul;
+        rightSpeed /= nitroSpeedMul;
+    }
+
+    IEnumerator ChargeLeftNitro()
+    {
+        while(leftNitro < 10)
+        {
+            if (leftNActivated)
+                break;
+            leftNitro++;
+            yield return new WaitForSeconds(1.0f);
+        }
+        StopCoroutine(ChargeLeftNitro());
+        leftNCharging = false;
     }
 
 }
