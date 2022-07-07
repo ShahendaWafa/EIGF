@@ -11,11 +11,13 @@ public class WheelController : MonoBehaviour
 
     [SerializeField] ParticleSystem leftSmokePrefab;
     [SerializeField] ParticleSystem rightSmokePrefab;
+    [SerializeField] ParticleSystem screenEffect;
 
     [SerializeField] Slider leftSlider;
     [SerializeField] Slider rightSlider;
 
     [SerializeField] Camera camera;
+
     [SerializeField] Transform cameraTransform;
     [SerializeField] WheelCollider leftWheel;
     [SerializeField] WheelCollider rightWheel;
@@ -62,6 +64,7 @@ public class WheelController : MonoBehaviour
     PhotonView view;
     Quaternion fixedRotation;
 
+    bool isShaking = false;
 
     private void Start()
     {
@@ -72,7 +75,11 @@ public class WheelController : MonoBehaviour
             Destroy(camera);
             leftSlider.gameObject.SetActive(false);
             rightSlider.gameObject.SetActive(false);
+            Destroy(screenEffect);
         }
+        leftSmokePrefab.Stop();
+        rightSmokePrefab.Stop();
+
     }
     private void Update()
     {
@@ -90,18 +97,24 @@ public class WheelController : MonoBehaviour
             {
                 if (!leftNActivated)
                 {
-                    leftSmokePrefab.gameObject.SetActive(true);
+                    leftSmokePrefab.Play();
+                    screenEffect.gameObject.SetActive(true);
                     leftNActivated = true;
                     leftForce = 1;
                     leftSpeed *= nitroSpeedMul;
                     StartCoroutine(ActivateLeftNitro());
-                    StartCoroutine(ShakeCamera());
+                    if(!isShaking)
+                    {
+                        isShaking = true;
+                        StartCoroutine(ShakeCamera());
+                    }
                 }
 
             }
             else
             {
-                leftSmokePrefab.gameObject.SetActive(false);
+                screenEffect.gameObject.SetActive(false);
+                leftSmokePrefab.Stop();
                 leftForce = 0;
                 leftNActivated = false;
             }
@@ -109,19 +122,25 @@ public class WheelController : MonoBehaviour
             {
                 if (!rightNActivated)
                 {
-                    rightSmokePrefab.gameObject.SetActive(true);
+                    rightSmokePrefab.Play();
+                    screenEffect.gameObject.SetActive(true);
 
                     rightNActivated = true;
                     rightForce = 1;
                     rightSpeed *= nitroSpeedMul;
                     StartCoroutine(ActivateRightNitro());
-                    StartCoroutine(ShakeCamera());
-
+                    if (!isShaking)
+                    {
+                        isShaking = true;
+                        StartCoroutine(ShakeCamera());
+                    }
                 }
             }
             else
             {
-                rightSmokePrefab.gameObject.SetActive(false);
+                rightSmokePrefab.Stop();
+                screenEffect.gameObject.SetActive(false);
+
                 rightForce = 0;
                 rightNActivated = false;
             }
@@ -276,14 +295,19 @@ public class WheelController : MonoBehaviour
 
     IEnumerator ShakeCamera()
     {
+        float allX = 0;
+        float allY = 0;
         while (leftNActivated || rightNActivated)
         {
-            float x = Random.Range(-1f, 1f) * 0.3f;
-            float y = Random.Range(-1f, 1f) * 0.3f;
+            float x = Random.Range(-1f, 1f) * 0.2f;
+            float y = Random.Range(-1f, 1f) * 0.2f;
+            allX += x;
+            allY += y;
             camera.transform.position = new Vector3(camera.transform.position.x + x, camera.transform.position.y + y, camera.transform.position.z);
             yield return null;
         }
-        camera.transform.position = cameraTransform.position;
+        camera.transform.position = new Vector3(camera.transform.position.x - allX, camera.transform.position.y - allY, camera.transform.position.z);
+        isShaking = false;
         StopCoroutine(ShakeCamera());
     }
 }
