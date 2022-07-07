@@ -29,7 +29,7 @@ public class WheelController : MonoBehaviour
     [SerializeField] float leftSpeed = 10;
     [SerializeField] float rightSpeed = 10;
 
-    [SerializeField] float nitroSpeedMul = 10;
+    [SerializeField] float nitroSpeedMul = 100;
 
     float leftVInput;
     float rightVInput;
@@ -145,6 +145,8 @@ public class WheelController : MonoBehaviour
     void LeftWheelMovement()
     {
         currentLeftAcceleration = acceleration * leftVInput;
+        currentLeftTurnAngle = maxTurnAngle * Input.GetAxis("LeftHorizontal");
+        leftWheel.steerAngle = currentLeftTurnAngle;
 
         if (currentLeftAcceleration == 0)
             leftWheel.brakeTorque = Mathf.Infinity;
@@ -152,9 +154,14 @@ public class WheelController : MonoBehaviour
         {
             leftWheel.brakeTorque = 0;
             leftWheel.motorTorque = currentLeftAcceleration * leftSpeed;
+
+            if (leftNActivated)
+            {
+                rb.AddForce(transform.forward * 10000);
+            }
         }
-        currentLeftTurnAngle = maxTurnAngle * Input.GetAxis("LeftHorizontal");
-        leftWheel.steerAngle = currentLeftTurnAngle;
+        
+        
 
         UpdateWheel(leftWheel, leftWheelTransform, leftWheelCylinderTransform);
     }
@@ -162,6 +169,8 @@ public class WheelController : MonoBehaviour
     void RightWheelMovement()
     {
         currentRightAcceleration = acceleration * rightVInput;
+        currentRightTurnAngle = maxTurnAngle * Input.GetAxis("RightHorizontal");
+        rightWheel.steerAngle = currentRightTurnAngle;
 
         if (currentRightAcceleration == 0)
         {
@@ -169,15 +178,18 @@ public class WheelController : MonoBehaviour
         }
         else
         {
+           
             rightWheel.brakeTorque = 0;
             rightWheel.motorTorque = currentRightAcceleration * rightSpeed;
+            if (rightNActivated)
+            {
+                rb.AddForce(transform.forward * 10000);
+            }
         }
 
-        currentRightTurnAngle = maxTurnAngle * Input.GetAxis("RightHorizontal");
-        rightWheel.steerAngle = currentRightTurnAngle;
+        
 
         UpdateWheel(rightWheel, rightWheelTransform, rightWheelCylinderTransform);
-        rightWheelTransform.position = rightWheelCylinderTransform.position;
     }
 
     
